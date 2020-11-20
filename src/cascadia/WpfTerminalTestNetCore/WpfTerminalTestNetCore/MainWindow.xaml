@@ -8,6 +8,15 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-	<term:TerminalControl x:Name="Terminal" Focusable="true" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />            
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Row="0">
+            <Button Click="ResizeTest">Resize Test</Button>
+            <Button Click="ResetSize">Reset Size</Button>
+            <Button Click="ColorTest">Color Test</Button>
+        </StackPanel>
+        <term:TerminalControl x:Name="Terminal" Grid.Row="1" Focusable="true" FontFamily="Cascadia Code" FontSize="12" BorderBrush="DarkGray" BorderThickness="2" />
     </Grid>
 </Window>

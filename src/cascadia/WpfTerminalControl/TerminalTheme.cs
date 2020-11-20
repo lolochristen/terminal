@@ -5,13 +5,13 @@
 
 namespace Microsoft.Terminal.Wpf
 {
-    using System;
-    using System.Runtime.InteropServices;
+    using System.Linq;
+    using System.Windows.Media;
 
     /// <summary>
     /// Enum for the style of cursor to display in the terminal.
     /// </summary>
-    public enum CursorStyle : uint
+    public enum CursorStyle : ulong
     {
         /// <summary>
         /// Cursor will be rendered as a blinking block.
@@ -52,39 +52,63 @@ namespace Microsoft.Terminal.Wpf
     /// <summary>
     /// Structure for color handling in the terminal.
     /// </summary>
-    /// <remarks>Keep in sync with HwndTerminal.hpp.</remarks>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct TerminalTheme
+    public class TerminalTheme
     {
         /// <summary>
-        /// The default background color of the terminal, represented in Win32 COLORREF format.
+        /// Gets or sets the default background color of the terminal.
         /// </summary>
-        public uint DefaultBackground;
+        public Color DefaultBackground { get; set; }
 
         /// <summary>
-        /// The default foreground color of the terminal, represented in Win32 COLORREF format.
+        /// Gets or sets the default foreground color of the terminal.
         /// </summary>
-        public uint DefaultForeground;
+        public Color DefaultForeground { get; set; }
 
         /// <summary>
-        /// The default selection background color of the terminal, represented in Win32 COLORREF format.
+        /// Gets or sets the default selection background color of the terminal.
         /// </summary>
-        public uint DefaultSelectionBackground;
+        public Color DefaultSelectionBackground { get; set; }
 
         /// <summary>
-        /// The opacity alpha for the selection color of the terminal, must be between 1.0 and 0.0.
+        /// Gets or sets the opacity alpha for the selection color of the terminal, must be between 1.0 and 0.0.
         /// </summary>
-        public float SelectionBackgroundAlpha;
+        public float SelectionBackgroundAlpha { get; set; }
 
         /// <summary>
-        /// The style of cursor to use in the terminal.
+        /// Gets or sets the style of cursor to use in the terminal.
         /// </summary>
-        public CursorStyle CursorStyle;
+        public CursorStyle CursorStyle { get; set; }
 
         /// <summary>
-        /// The color array to use for the terminal, filling the standard vt100 16 color table, represented in Win32 COLORREF format.
+        /// Gets or sets the color array to use for the terminal, filling the standard vt100 16 color table.
         /// </summary>
-        [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U4, SizeConst = 16)]
-        public uint[] ColorTable;
+        public Color[] ColorTable { get; set; }
+
+        /// <summary>
+        /// Return the color in Win32 COLORREF.
+        /// </summary>
+        /// <param name="color">color.</param>
+        /// <returns>Win32 COLORREF.</returns>
+        internal static uint ToColorRef(Color color)
+        {
+            return (uint)System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.FromArgb(color.R, color.G, color.B));
+        }
+
+        /// <summary>
+        /// Creates the internalTerminalTheme structure.
+        /// </summary>
+        /// <returns>TerminalTheme structure.</returns>
+        internal TerminalThemeInternal CreateInternal()
+        {
+            return new TerminalThemeInternal()
+            {
+                DefaultBackground = ToColorRef(this.DefaultBackground),
+                DefaultForeground = ToColorRef(this.DefaultForeground),
+                DefaultSelectionBackground = ToColorRef(this.DefaultSelectionBackground),
+                SelectionBackgroundAlpha = this.SelectionBackgroundAlpha,
+                CursorStyle = this.CursorStyle,
+                ColorTable = this.ColorTable.Select(p => ToColorRef(p)).ToArray(),
+            };
+        }
     }
 }

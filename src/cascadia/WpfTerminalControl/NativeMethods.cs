@@ -233,7 +233,7 @@ namespace Microsoft.Terminal.Wpf
         public static extern void TerminalSendCharEvent(IntPtr terminal, char ch, ushort scanCode, ushort flags);
 
         [DllImport("PublicTerminalCore.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-        public static extern void TerminalSetTheme(IntPtr terminal, [MarshalAs(UnmanagedType.Struct)] TerminalTheme theme, string fontFamily, short fontSize, int newDpi);
+        public static extern void TerminalSetTheme(IntPtr terminal, [MarshalAs(UnmanagedType.Struct)] TerminalThemeInternal theme, string fontFamily, short fontSize, int newDpi);
 
         [DllImport("PublicTerminalCore.dll", CallingConvention = CallingConvention.StdCall)]
         public static extern void TerminalBlinkCursor(IntPtr terminal);

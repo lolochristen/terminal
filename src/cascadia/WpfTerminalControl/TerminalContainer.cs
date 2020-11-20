@@ -132,7 +132,7 @@ namespace Microsoft.Terminal.Wpf
         /// <param name="theme">The color theme for the terminal to use.</param>
         /// <param name="fontFamily">The font family to use in the terminal.</param>
         /// <param name="fontSize">The font size to use in the terminal.</param>
-        internal void SetTheme(TerminalTheme theme, string fontFamily, short fontSize)
+        internal void SetTheme(TerminalThemeInternal theme, string fontFamily, short fontSize)
         {
             var dpiScale = VisualTreeHelper.GetDpi(this);
 
