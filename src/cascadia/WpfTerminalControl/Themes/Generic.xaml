@@ -3,8 +3,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:Microsoft.Terminal.Wpf">
 
-
     <Style TargetType="{x:Type local:TerminalControl}">
+        <Setter Property="Background" Value="#0C0C0C"/>
+        <Setter Property="Foreground" Value="#CCCCCC"/>
+        <Setter Property="FontFamily" Value="Cascadia Code" />
+        <Setter Property="FontSize" Value="11" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:TerminalControl}">

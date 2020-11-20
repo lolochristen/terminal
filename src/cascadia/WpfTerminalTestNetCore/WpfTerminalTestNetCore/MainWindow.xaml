@@ -17,6 +17,36 @@
             <Button Click="ResetSize">Reset Size</Button>
             <Button Click="ColorTest">Color Test</Button>
         </StackPanel>
-        <term:TerminalControl x:Name="Terminal" Grid.Row="1" Focusable="true" FontFamily="Cascadia Code" FontSize="12" BorderBrush="DarkGray" BorderThickness="2" />
+        <term:TerminalControl x:Name="Terminal" Grid.Row="1" Focusable="true"
+                              FontFamily="Cascadia Code" FontSize="12"
+                              Background="#1E1E1E" Foreground="#F2F2F2"
+                              BorderBrush="DarkGray" BorderThickness="2">
+            <term:TerminalControl.Theme>
+                <term:TerminalTheme DefaultSelectionBackground="#AAAAAA" 
+                                    SelectionBackgroundAlpha=".5"
+                                    CursorStyle="BlinkingBar">
+                    <term:TerminalTheme.ColorTable>
+                        <x:Array Type="{x:Type Color}">
+                            <Color>#1E1E1E</Color>
+                            <Color>#A1130E</Color>
+                            <Color>#0FC51F</Color>
+                            <Color>#9CC100</Color>
+                            <Color>#3700DA</Color>
+                            <Color>#178898</Color>
+                            <Color>#963ADD</Color>
+                            <Color>#CCCCCC</Color>
+                            <Color>#767676</Color>
+                            <Color>#C6160C</Color>
+                            <Color>#48E756</Color>
+                            <Color>#F1F9A5</Color>
+                            <Color>#783BFF</Color>
+                            <Color>#D661D6</Color>
+                            <Color>#00B49E</Color>
+                            <Color>#F2F2F2</Color>
+                        </x:Array>
+                    </term:TerminalTheme.ColorTable>
+                </term:TerminalTheme>
+            </term:TerminalControl.Theme>
+        </term:TerminalControl>
     </Grid>
 </Window>

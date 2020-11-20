@@ -38,8 +38,6 @@ namespace Microsoft.Terminal.Wpf
 
         private static TerminalTheme defaultTerminalTheme = new TerminalTheme()
         {
-            DefaultBackground = Color.FromRgb(0x0c, 0x0c, 0x0c),
-            DefaultForeground = Color.FromRgb(0xcc, 0xcc, 0xcc),
             CursorStyle = CursorStyle.BlinkingBar,
             SelectionBackgroundAlpha = .5f,
             DefaultSelectionBackground = Color.FromRgb(0xbb, 0xbb, 0xbb),
@@ -56,12 +54,12 @@ namespace Microsoft.Terminal.Wpf
                     Color.FromRgb(0x96, 0x3A, 0xDD),
                     Color.FromRgb(0xCC, 0xCC, 0xCC),
                     Color.FromRgb(0x76, 0x76, 0x76),
-                    Color.FromRgb(0x48, 0xE7, 0x56),
                     Color.FromRgb(0xC6, 0x16, 0x0C),
+                    Color.FromRgb(0x48, 0xE7, 0x56),
                     Color.FromRgb(0xF1, 0xF9, 0xA5),
                     Color.FromRgb(0x78, 0x3B, 0xFF),
-                    Color.FromRgb(0x00, 0xB4, 0x9E),
                     Color.FromRgb(0xD6, 0x61, 0xD6),
+                    Color.FromRgb(0x00, 0xB4, 0x9E),
                     Color.FromRgb(0xF2, 0xF2, 0xF2),
             },
         };
@@ -217,10 +215,19 @@ namespace Microsoft.Terminal.Wpf
                 return;
             }
 
+            // default colors and font from control..
+
             var fontFamily = this.FontFamily.FamilyNames.FirstOrDefault().Value;
             var fontSize = (short)this.FontSize;
 
-            var themeInternal = theme.CreateInternal();
+            Color bg, fg;
+            var brush = this.Background as SolidColorBrush;
+            bg = brush != null ? brush.Color : Colors.Black;
+
+            brush = this.Foreground as SolidColorBrush;
+            fg = brush != null ? brush.Color : Colors.White;
+
+            var themeInternal = theme.CreateInternal(bg, fg);
             this.termContainer.SetTheme(themeInternal, fontFamily, fontSize);
         }
 

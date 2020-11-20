@@ -55,16 +55,6 @@ namespace Microsoft.Terminal.Wpf
     public class TerminalTheme
     {
         /// <summary>
-        /// Gets or sets the default background color of the terminal.
-        /// </summary>
-        public Color DefaultBackground { get; set; }
-
-        /// <summary>
-        /// Gets or sets the default foreground color of the terminal.
-        /// </summary>
-        public Color DefaultForeground { get; set; }
-
-        /// <summary>
         /// Gets or sets the default selection background color of the terminal.
         /// </summary>
         public Color DefaultSelectionBackground { get; set; }
@@ -97,13 +87,15 @@ namespace Microsoft.Terminal.Wpf
         /// <summary>
         /// Creates the internalTerminalTheme structure.
         /// </summary>
+        /// <param name="defaultBackground">Background color.</param>
+        /// <param name="defaultForeground">Foreground color.</param>
         /// <returns>TerminalTheme structure.</returns>
-        internal TerminalThemeInternal CreateInternal()
+        internal TerminalThemeInternal CreateInternal(Color defaultBackground, Color defaultForeground)
         {
             return new TerminalThemeInternal()
             {
-                DefaultBackground = ToColorRef(this.DefaultBackground),
-                DefaultForeground = ToColorRef(this.DefaultForeground),
+                DefaultBackground = ToColorRef(defaultBackground),
+                DefaultForeground = ToColorRef(defaultForeground),
                 DefaultSelectionBackground = ToColorRef(this.DefaultSelectionBackground),
                 SelectionBackgroundAlpha = this.SelectionBackgroundAlpha,
                 CursorStyle = this.CursorStyle,
