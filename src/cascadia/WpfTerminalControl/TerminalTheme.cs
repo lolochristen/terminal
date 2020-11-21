@@ -55,6 +55,16 @@ namespace Microsoft.Terminal.Wpf
     public class TerminalTheme
     {
         /// <summary>
+        /// Gets or sets the default background color of the terminal, represented in Win32 COLORREF format.
+        /// </summary>
+        public Color DefaultBackground { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default foreground color of the terminal, represented in Win32 COLORREF format.
+        /// </summary>
+        public Color DefaultForeground { get; set; }
+
+        /// <summary>
         /// Gets or sets the default selection background color of the terminal.
         /// </summary>
         public Color DefaultSelectionBackground { get; set; }
@@ -85,17 +95,24 @@ namespace Microsoft.Terminal.Wpf
         }
 
         /// <summary>
+        /// IsUndefinedColor.
+        /// </summary>
+        /// <param name="color">Color.</param>
+        /// <returns>if color is undefined.</returns>
+        internal static bool IsUndefinedColor(Color color) => color.A == 0 && color.R == 0 && color.B == 0 && color.G == 0;
+
+        /// <summary>
         /// Creates the internalTerminalTheme structure.
         /// </summary>
-        /// <param name="defaultBackground">Background color.</param>
-        /// <param name="defaultForeground">Foreground color.</param>
+        /// <param name="fallbackBackground">Background color.</param>
+        /// <param name="fallbackForeground">Foreground color.</param>
         /// <returns>TerminalTheme structure.</returns>
-        internal TerminalThemeInternal CreateInternal(Color defaultBackground, Color defaultForeground)
+        internal TerminalThemeInternal CreateInternal(Color fallbackBackground, Color fallbackForeground)
         {
             return new TerminalThemeInternal()
             {
-                DefaultBackground = ToColorRef(defaultBackground),
-                DefaultForeground = ToColorRef(defaultForeground),
+                DefaultBackground = ToColorRef(IsUndefinedColor(this.DefaultBackground) ? fallbackBackground : this.DefaultBackground),
+                DefaultForeground = ToColorRef(IsUndefinedColor(this.DefaultForeground) ? fallbackForeground : this.DefaultForeground),
                 DefaultSelectionBackground = ToColorRef(this.DefaultSelectionBackground),
                 SelectionBackgroundAlpha = this.SelectionBackgroundAlpha,
                 CursorStyle = this.CursorStyle,
