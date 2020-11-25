@@ -16,6 +16,7 @@
             <Button Click="ResizeTest">Resize Test</Button>
             <Button Click="ResetSize">Reset Size</Button>
             <Button Click="ColorTest">Color Test</Button>
+            <Button Click="PositionTest">Position Test</Button>
         </StackPanel>
         <term:TerminalControl x:Name="Terminal" Grid.Row="1" Focusable="true"
                               FontFamily="Cascadia Code" FontSize="12"
@@ -24,7 +25,7 @@
             <term:TerminalControl.Theme>
                 <term:TerminalTheme DefaultSelectionBackground="#AAAAAA" 
                                     SelectionBackgroundAlpha=".5"
-                                    CursorStyle="BlinkingBar">
+                                    CursorStyle="BlinkingBlock">
                     <term:TerminalTheme.ColorTable>
                         <x:Array Type="{x:Type Color}">
                             <Color>#1E1E1E</Color>

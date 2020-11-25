@@ -244,6 +244,35 @@ namespace Microsoft.Terminal.Wpf
             }
         }
 
+        /// <summary>
+        /// Sets the cursor position.
+        /// </summary>
+        /// <param name="x">X.</param>
+        /// <param name="y">Y.</param>
+        internal void SetCursorPosition(short x, short y)
+        {
+            if (this.terminal != IntPtr.Zero)
+            {
+                NativeMethods.TerminalSetCursorPosition(this.terminal, x, y);
+            }
+        }
+
+        /// <summary>
+        /// Gets the sursor position.
+        /// </summary>
+        /// <returns>(X, Y) position.</returns>
+        internal (short X, short Y) GetCursorPosition()
+        {
+            if (this.terminal != IntPtr.Zero)
+            {
+                NativeMethods.COORD coord;
+                NativeMethods.TerminalGetCursorPosition(this.terminal, out coord);
+                return (coord.X, coord.Y);
+            }
+
+            return (0, 0);
+        }
+
         /// <inheritdoc/>
         protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
         {

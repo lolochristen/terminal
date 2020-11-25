@@ -177,6 +177,25 @@ namespace Microsoft.Terminal.Wpf
             return (this.Rows, this.Columns);
         }
 
+        /// <summary>
+        /// Sets the cursor position.
+        /// </summary>
+        /// <param name="x">X.</param>
+        /// <param name="y">Y.</param>
+        public void SetCursorPosition(short x, short y)
+        {
+            this.termContainer.SetCursorPosition(x, y);
+        }
+
+        /// <summary>
+        /// Gets the sursor position.
+        /// </summary>
+        /// <returns>(X, Y) position.</returns>
+        public (short X, short Y) GetCursorPosition()
+        {
+            return this.termContainer.GetCursorPosition();
+        }
+
         /// <inheritdoc/>
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {

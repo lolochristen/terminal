@@ -842,6 +842,30 @@ void __stdcall TerminalKillFocus(void* terminal)
     publicTerminal->_focused = false;
 }
 
+void __stdcall TerminalSetCursorPosition(void* terminal, _In_ short x, _In_ short y)
+{
+    auto publicTerminal = static_cast<HwndTerminal*>(terminal);
+    publicTerminal->_SetCursorPosition(x, y);
+}
+
+void __stdcall TerminalGetCursorPosition(void* terminal, _Out_ COORD* position)
+{
+    auto publicTerminal = static_cast<HwndTerminal*>(terminal);
+    COORD coord = publicTerminal->_GetCursorPosition();
+    position->X = coord.X;
+    position->Y = coord.Y;
+}
+
+void HwndTerminal::_SetCursorPosition(short x, short y)
+{
+    _terminal->SetCursorPosition(x, y);
+}
+
+COORD HwndTerminal::_GetCursorPosition()
+{
+    return _terminal->GetCursorPosition();
+}
+
 // Routine Description:
 // - Copies the text given onto the global system clipboard.
 // Arguments:

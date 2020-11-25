@@ -132,5 +132,13 @@ namespace WpfTerminalTestNetCore
             Terminal.Connection.WriteInput(data);
             Terminal.Focus();
         }
+
+        private void PositionTest(object sender, RoutedEventArgs e)
+        {
+            var pos = Terminal.GetCursorPosition();
+            Terminal.Connection.WriteInput($"({pos.X},{pos.Y})");
+            Terminal.SetCursorPosition(20, 20);
+            Terminal.Focus();
+        }
     }
 }

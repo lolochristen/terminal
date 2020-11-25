@@ -44,6 +44,8 @@ __declspec(dllexport) void _stdcall TerminalBlinkCursor(void* terminal);
 __declspec(dllexport) void _stdcall TerminalSetCursorVisible(void* terminal, const bool visible);
 __declspec(dllexport) void _stdcall TerminalSetFocus(void* terminal);
 __declspec(dllexport) void _stdcall TerminalKillFocus(void* terminal);
+__declspec(dllexport) void _stdcall TerminalSetCursorPosition(void* terminal, _In_ short x, _In_ short y);
+__declspec(dllexport) void _stdcall TerminalGetCursorPosition(void* terminal, _Out_ COORD* position);
 };
 
 struct HwndTerminal : ::Microsoft::Console::Types::IControlAccessibilityInfo
@@ -106,6 +108,8 @@ private:
     friend void _stdcall TerminalSetCursorVisible(void* terminal, const bool visible);
     friend void _stdcall TerminalSetFocus(void* terminal);
     friend void _stdcall TerminalKillFocus(void* terminal);
+    friend void _stdcall TerminalSetCursorPosition(void* terminal, _In_ short x, _In_ short y);
+    friend void _stdcall TerminalGetCursorPosition(void* terminal, _Out_ COORD* position);
 
     void _UpdateFont(int newDpi);
     void _WriteTextToConnection(const std::wstring& text) noexcept;
@@ -134,4 +138,7 @@ private:
     void ChangeViewport(const SMALL_RECT NewWindow) override;
     HRESULT GetHostUiaProvider(IRawElementProviderSimple** provider) noexcept override;
     RECT GetPadding() const noexcept override;
+
+    void _SetCursorPosition(short x, short y);
+    COORD _GetCursorPosition();
 };
