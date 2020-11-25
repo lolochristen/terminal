@@ -20,7 +20,6 @@ namespace Microsoft.Terminal.Wpf
     /// </remarks>
     public class TerminalContainer : HwndHost
     {
-        private ITerminalConnection connection;
         private IntPtr hwnd;
         private IntPtr terminal;
         private DispatcherTimer blinkTimer;
@@ -53,6 +52,11 @@ namespace Microsoft.Terminal.Wpf
         }
 
         /// <summary>
+        /// Event that is fired when input is available.
+        /// </summary>
+        internal event EventHandler<string> TerminalInput;
+
+        /// <summary>
         /// Event that is fired when the terminal buffer scrolls from text output.
         /// </summary>
         internal event EventHandler<(int viewTop, int viewHeight, int bufferSize)> TerminalScrolled;
@@ -61,6 +65,11 @@ namespace Microsoft.Terminal.Wpf
         /// Event that is fired when the user engages in a mouse scroll over the terminal hwnd.
         /// </summary>
         internal event EventHandler<int> UserScrolled;
+
+        /// <summary>
+        /// Event that is fired when the terminal buffer scrolls from text output.
+        /// </summary>
+        internal event EventHandler<(uint rows, uint columns)> TerminalResized;
 
         /// <summary>
         /// Gets or sets a value indicating whether if the renderer should automatically resize to fill the control
@@ -93,29 +102,6 @@ namespace Microsoft.Terminal.Wpf
         /// Gets the window handle of the terminal.
         /// </summary>
         internal IntPtr Hwnd => this.hwnd;
-
-        /// <summary>
-        /// Sets the connection to the terminal backend.
-        /// </summary>
-        internal ITerminalConnection Connection
-        {
-            private get
-            {
-                return this.connection;
-            }
-
-            set
-            {
-                if (this.connection != null)
-                {
-                    this.connection.TerminalOutput -= this.Connection_TerminalOutput;
-                }
-
-                this.connection = value;
-                this.connection.TerminalOutput += this.Connection_TerminalOutput;
-                this.connection.Start();
-            }
-        }
 
         /// <summary>
         /// Manually invoke a scroll of the terminal buffer.
@@ -179,7 +165,7 @@ namespace Microsoft.Terminal.Wpf
             this.Columns = dimensions.X;
             this.TerminalRendererSize = renderSize;
 
-            this.Connection?.Resize((uint)dimensions.Y, (uint)dimensions.X);
+            this.TerminalResized?.Invoke(this, ((uint)dimensions.Y, (uint)dimensions.X));
         }
 
         /// <summary>
@@ -216,7 +202,7 @@ namespace Microsoft.Terminal.Wpf
                 Height = dimensionsInPixels.cy,
             };
 
-            this.Connection?.Resize((uint)dimensions.Y, (uint)dimensions.X);
+            this.TerminalResized?.Invoke(this, ((uint)dimensions.Y, (uint)dimensions.X));
         }
 
         /// <summary>
@@ -240,7 +226,7 @@ namespace Microsoft.Terminal.Wpf
 
             if (this.Columns < columns || this.Rows < rows)
             {
-                this.connection?.Resize(rows, columns);
+                this.TerminalResized?.Invoke(this, (rows, columns));
             }
         }
 
@@ -271,6 +257,18 @@ namespace Microsoft.Terminal.Wpf
             }
 
             return (0, 0);
+        }
+
+        /// <summary>
+        /// Sends output to Terminal.
+        /// </summary>
+        /// <param name="data">data to send.</param>
+        internal void TerminalSendOutput(string data)
+        {
+            if (this.terminal != IntPtr.Zero)
+            {
+                NativeMethods.TerminalSendOutput(this.terminal, data);
+            }
         }
 
         /// <inheritdoc/>
@@ -416,7 +414,7 @@ namespace Microsoft.Terminal.Wpf
                             NativeMethods.TerminalCalculateResize(this.terminal, (short)this.TerminalControlSize.Width, (short)this.TerminalControlSize.Height, out dimensions);
                         }
 
-                        this.Connection?.Resize((uint)dimensions.Y, (uint)dimensions.X);
+                        this.TerminalResized?.Invoke(this, ((uint)dimensions.Y, (uint)dimensions.X));
                         break;
 
                     case NativeMethods.WindowMessage.WM_MOUSEWHEEL:
@@ -473,7 +471,7 @@ namespace Microsoft.Terminal.Wpf
 
         private void OnWrite(string data)
         {
-            this.Connection?.WriteInput(data);
+            this.TerminalInput?.Invoke(this, data);
         }
     }
 }

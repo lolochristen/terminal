@@ -19,7 +19,6 @@ namespace Microsoft.Terminal.Wpf
     /// A terminal control based on Windows Terminal components. This control can receive and render standard VT100 sequences.
     /// </summary>
     /// <remarks>
-    /// An implementation of <see cref="ITerminalConnection"/> needs to be assiagned to communication wiht the unterlying terminal.
     /// To change the theme <see cref="TerminalTheme"/> needs to be assign to property <see cref="Theme"/>.
     /// </remarks>
     public class TerminalControl : Control
@@ -27,14 +26,14 @@ namespace Microsoft.Terminal.Wpf
         /// <summary>
         /// TerminalConnection Property.
         /// </summary>
-        public static readonly DependencyProperty ConnectionProperty =
-            DependencyProperty.Register("Connection", typeof(ITerminalConnection), typeof(TerminalControl), new PropertyMetadata(null, ConnectionChanged));
+        public static readonly DependencyProperty ThemeProperty =
+            DependencyProperty.Register("Theme", typeof(TerminalTheme), typeof(TerminalControl), new PropertyMetadata(defaultTerminalTheme, ThemeChanged));
 
         /// <summary>
         /// TerminalConnection Property.
         /// </summary>
-        public static readonly DependencyProperty ThemeProperty =
-            DependencyProperty.Register("Theme", typeof(TerminalTheme), typeof(TerminalControl), new PropertyMetadata(defaultTerminalTheme, ThemeChanged));
+        public static readonly DependencyProperty ConnectionProperty =
+            DependencyProperty.Register("Connection", typeof(TerminalConnection), typeof(TerminalControl), new PropertyMetadata(null, ConnectionChanged));
 
         private static TerminalTheme defaultTerminalTheme = new TerminalTheme()
         {
@@ -74,6 +73,16 @@ namespace Microsoft.Terminal.Wpf
         }
 
         /// <summary>
+        /// Events raised when input on the Terminal was received.
+        /// </summary>
+        public event EventHandler<InputReceivedEventArgs> InputReceived;
+
+        /// <summary>
+        /// Event raised when terminal got resized.
+        /// </summary>
+        public event EventHandler<TerminalResizedEventArgs> TerminalResized;
+
+        /// <summary>
         /// Gets or sets a value indicating whether if the renderer should automatically resize to fill the control
         /// on user action.
         /// </summary>
@@ -89,15 +98,6 @@ namespace Microsoft.Terminal.Wpf
         public int Columns => this.termContainer.Columns;
 
         /// <summary>
-        /// Gets or sets the connection to a terminal backend.
-        /// </summary>
-        public ITerminalConnection Connection
-        {
-            get { return (ITerminalConnection)this.GetValue(ConnectionProperty); }
-            set { this.SetValue(ConnectionProperty, value); }
-        }
-
-        /// <summary>
         /// Gets the current character rows available to the terminal.
         /// </summary>
         public int Rows => this.termContainer.Rows;
@@ -109,6 +109,15 @@ namespace Microsoft.Terminal.Wpf
         {
             get { return (TerminalTheme)this.GetValue(ThemeProperty); }
             set { this.SetValue(ThemeProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the connection to a terminal backend.
+        /// </summary>
+        public TerminalConnection Connection
+        {
+            get { return (TerminalConnection)this.GetValue(ConnectionProperty); }
+            set { this.SetValue(ConnectionProperty, value); }
         }
 
         /// <summary>
@@ -136,6 +145,8 @@ namespace Microsoft.Terminal.Wpf
 
             this.termContainer.TerminalScrolled += this.TermControl_TerminalScrolled;
             this.termContainer.UserScrolled += this.TermControl_UserScrolled;
+            this.termContainer.TerminalResized += this.TermControl_TerminalResized;
+            this.termContainer.TerminalInput += this.TermControl_TerminalInput;
             this.scrollbar.MouseWheel += this.Scrollbar_MouseWheel;
             this.scrollbar.Scroll += this.Scrollbar_Scroll;
             this.GotFocus += this.TerminalControl_GotFocus;
@@ -196,6 +207,33 @@ namespace Microsoft.Terminal.Wpf
             return this.termContainer.GetCursorPosition();
         }
 
+        /// <summary>
+        /// Sends data to the Terminal.
+        /// </summary>
+        /// <param name="data">Data to send.</param>
+        public void SendOutput(string data)
+        {
+            this.termContainer.TerminalSendOutput(data);
+        }
+
+        /// <summary>
+        /// Implementation when input received.
+        /// </summary>
+        /// <param name="eventArgs">Event arguments.</param>
+        protected virtual void OnInputReceived(InputReceivedEventArgs eventArgs)
+        {
+            this.InputReceived?.Invoke(this, eventArgs);
+        }
+
+        /// <summary>
+        /// Implementation when terminal got resized.
+        /// </summary>
+        /// <param name="eventArgs">Event arguments.</param>
+        protected virtual void OnTerminalResized(TerminalResizedEventArgs eventArgs)
+        {
+            this.TerminalResized?.Invoke(this, eventArgs);
+        }
+
         /// <inheritdoc/>
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
@@ -235,7 +273,6 @@ namespace Microsoft.Terminal.Wpf
             }
 
             // default colors and font from control..
-
             var fontFamily = this.FontFamily.FamilyNames.FirstOrDefault().Value;
             var fontSize = (short)this.FontSize;
 
@@ -250,21 +287,26 @@ namespace Microsoft.Terminal.Wpf
             this.termContainer.SetTheme(themeInternal, fontFamily, fontSize);
         }
 
-        private static void ConnectionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var terminalControl = (TerminalControl)d;
-            if (terminalControl.termContainer != null)
-            {
-                terminalControl.termContainer.Connection = e.NewValue as ITerminalConnection;
-            }
-        }
-
         private static void ThemeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var terminalControl = (TerminalControl)d;
             if (terminalControl.termContainer != null)
             {
                 terminalControl.SetTheme(e.NewValue as TerminalTheme);
+            }
+        }
+
+        private static void ConnectionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var terminalControl = (TerminalControl)d;
+            if (e.NewValue != null)
+            {
+                ((TerminalConnection)e.NewValue).AttachToTerminalControl(terminalControl);
+            }
+
+            if (e.OldValue != null)
+            {
+                ((TerminalConnection)e.OldValue).DetachFromTerminalControl();
             }
         }
 
@@ -350,6 +392,20 @@ namespace Microsoft.Terminal.Wpf
             });
         }
 
+        private void TermControl_TerminalResized(object sender, (uint rows, uint columns) e)
+        {
+            this.Dispatcher.InvokeAsync(() =>
+            {
+                this.OnTerminalResized(new TerminalResizedEventArgs() { Rows = (int)e.rows, Columns = (int)e.columns });
+            });
+        }
+
+        private void TermControl_TerminalInput(object sender, string e)
+        {
+            // not dispatch
+            this.OnInputReceived(new InputReceivedEventArgs() { Data = e });
+        }
+
         private void TerminalControl_GotFocus(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
@@ -359,7 +415,6 @@ namespace Microsoft.Terminal.Wpf
         private void TerminalControlLoaded(object sender, EventArgs args)
         {
             // init
-            this.termContainer.Connection = this.Connection;
             this.SetTheme(this.Theme);
         }
     }
