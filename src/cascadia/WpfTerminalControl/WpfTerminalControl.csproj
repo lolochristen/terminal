@@ -18,6 +18,9 @@
     <Product>Microsoft.Windows.Terminal</Product>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageIconUrl>https://raw.githubusercontent.com/microsoft/terminal/main/res/terminal/images-Dev/Square44x44Logo.targetsize-96.png</PackageIconUrl>
+    <PackageId>Microsoft.Terminal.Wpf</PackageId>
+    <Description>Control of the new Windows Terminal for WPF</Description>
   </PropertyGroup>
   
   <ItemGroup>
