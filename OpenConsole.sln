@@ -222,6 +222,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PublicTerminalCore", "src\cascadia\PublicTerminalCore\PublicTerminalCore.vcxproj", "{84848BFA-931D-42CE-9ADF-01EE54DE7890}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfTerminalControl", "src\cascadia\WpfTerminalControl\WpfTerminalControl.csproj", "{376FE273-6B84-4EB5-8B30-8DE9D21B022C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{84848BFA-931D-42CE-9ADF-01EE54DE7890} = {84848BFA-931D-42CE-9ADF-01EE54DE7890}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests_TerminalApp", "src\cascadia\ut_app\TerminalApp.UnitTests.vcxproj", "{CA5CAD1A-9333-4D05-B12A-1905CBF112F9}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -309,7 +312,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fmt", "src\dep\fmt\fmt.vcxp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfTerminalTestNetCore", "src\cascadia\WpfTerminalTestNetCore\WpfTerminalTestNetCore\WpfTerminalTestNetCore.csproj", "{1588FD7C-241E-4E7D-9113-43735F3E6BAD}"
 	ProjectSection(ProjectDependencies) = postProject
-		{A22EC5F6-7851-4B88-AC52-47249D437A52} = {A22EC5F6-7851-4B88-AC52-47249D437A52}
 		{84848BFA-931D-42CE-9ADF-01EE54DE7890} = {84848BFA-931D-42CE-9ADF-01EE54DE7890}
 	EndProjectSection
 EndProject
