@@ -276,14 +276,14 @@ namespace Microsoft.Terminal.Wpf
             var fontFamily = this.FontFamily.FamilyNames.FirstOrDefault().Value;
             var fontSize = (short)this.FontSize;
 
-            Color bg, fg;
+            Color fallbackBackground, fallbackForeground;
             var brush = this.Background as SolidColorBrush;
-            bg = brush != null ? brush.Color : Colors.Black;
+            fallbackBackground = brush != null ? brush.Color : Colors.Black;
 
             brush = this.Foreground as SolidColorBrush;
-            fg = brush != null ? brush.Color : Colors.White;
+            fallbackForeground = brush != null ? brush.Color : Colors.White;
 
-            var themeInternal = theme.CreateInternal(bg, fg);
+            var themeInternal = theme.CreateInternal(fallbackBackground, fallbackForeground);
             this.termContainer.SetTheme(themeInternal, fontFamily, fontSize);
         }
 

@@ -5,6 +5,7 @@
 
 namespace Microsoft.Terminal.Wpf
 {
+    using System;
     using System.Linq;
     using System.Windows.Media;
 
@@ -109,6 +110,11 @@ namespace Microsoft.Terminal.Wpf
         /// <returns>TerminalTheme structure.</returns>
         internal TerminalThemeInternal CreateInternal(Color fallbackBackground, Color fallbackForeground)
         {
+            if (this.ColorTable.Length != 16)
+            {
+                throw new ArgumentException("ColorTable needs to hold 16 colors.");
+            }
+
             return new TerminalThemeInternal()
             {
                 DefaultBackground = ToColorRef(IsUndefinedColor(this.DefaultBackground) ? fallbackBackground : this.DefaultBackground),
